@@ -7,5 +7,6 @@ pub struct Track {
     pub artists: Vec<String>,
     pub album: String,
     pub created_at: String,
+    #[serde(skip_serializing)]
     pub path: String,
 }
