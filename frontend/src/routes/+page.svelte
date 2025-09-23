@@ -5,13 +5,13 @@
     let tracks: Track[] | null = $state(null);
 
     async function getTracks(): Promise<Track[]> {
-        let response = await fetch("https://localhost:6432/tracks");
-        console.log(tracks);
+        let response = await fetch("http://localhost:6432/tracks");
         return JSON.parse(await response.text());
     }
 
     onMount(async () => {
         tracks = await getTracks();
+        console.log(tracks);
     });
 </script>
 
@@ -21,7 +21,7 @@
     </header>
 
     <div class="tracks">
-        {#if tracks}
+        {#if tracks !== null}
             {#each tracks as track}
                 <div class="track">
                     <span class="number"></span>
