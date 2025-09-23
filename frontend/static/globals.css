@@ -1,0 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+    --bg-first: #222;
+    --bg-second: #333;
+    --bg-third: #373737;
+
+    --txt-first: #ddd;
+    --txt-second: #b3b3b3;
+}
