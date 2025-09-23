@@ -40,8 +40,8 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn index() -> &'static str {
-    "Hello, World!"
+async fn index() -> StatusCode {
+    StatusCode::OK
 }
 
 async fn track_by_id(State(state): State<Arc<AppState>>, Path(id): Path<i64>) -> Result<impl IntoResponse, StatusCode> {
