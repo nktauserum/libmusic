@@ -1,0 +1,7 @@
+{
+  "addr": "0.0.0.0:6432",
+  "db_path": "sqlite.db",
+  "index_dir": [
+    "example/"
+  ]
+}

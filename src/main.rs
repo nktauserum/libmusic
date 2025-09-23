@@ -1,6 +1,7 @@
 mod library;
 mod repository;
 mod types;
+mod config;
 
 use crate::library::Library;
 use crate::repository::Repository;
@@ -8,16 +9,16 @@ use axum::{response::Json, routing::get, Router, extract::{Path, State}, http::S
 use serde_json::{json, Value};
 use std::sync::Arc;
 use axum::http::header;
-use axum::serve::IncomingStream;
 use tokio_util::io::ReaderStream;
+use crate::config::Config;
 
 struct AppState {
     lib: Library
 }
 
 impl AppState {
-    fn new() -> Arc<Self> {
-        let repo = Repository::new("sqlite.db").unwrap();
+    fn new(db_path: &str) -> Arc<Self> {
+        let repo = Repository::new(db_path).unwrap();
         let lib = Library::new(repo);
 
         Arc::new(Self {
@@ -28,7 +29,8 @@ impl AppState {
 
 #[tokio::main]
 async fn main() {
-    let state = AppState::new();
+    let config = Config::load("config.json").await;
+    let state = AppState::new(config.db_path.as_str());
 
     let app = Router::new()
         .route("/", get(index))
@@ -36,7 +38,7 @@ async fn main() {
         .route("/track/{id}", get(track_by_id))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:6432").await.unwrap();
+    let listener = tokio::net::TcpListener::bind(config.addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
