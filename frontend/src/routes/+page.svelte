@@ -9,6 +9,10 @@
         return JSON.parse(await response.text())["tracks"];
     }
 
+    async function playTrack(track: Track) {
+        console.log(`http://localhost:6432/track/${track.id}`)
+    }
+
     onMount(async () => {
         tracks = await getTracks();
         console.log(tracks);
@@ -23,25 +27,25 @@
     <div class="tracks">
         {#if tracks !== null}
             {#each tracks as track}
-                <div class="track">
+                <button class="track" onclick={() => playTrack(track)} aria-label="track">
                     <span class="number"></span>
                     <span class="track__cover"></span>
                     <span class="title">{ track.title }</span>
                     <span class="artist">{ track.artists.join(', ') }</span>
                     <span class="album">{ track.album }</span>
                     <span class="controls">
-                        <button class="favorite" aria-label="favorite">
+                        <a href="#" class="favorite" aria-label="favorite">
                           <svg color="var(--txt-second)" width="28" height="28" viewBox="0 0 32 32">
                             <path fill="currentColor" d="M22.45 6a5.47 5.47 0 0 1 3.91 1.64a5.7 5.7 0 0 1 0 8L16 26.13L5.64 15.64a5.7 5.7 0 0 1 0-8a5.48 5.48 0 0 1 7.82 0l2.54 2.6l2.53-2.58A5.44 5.44 0 0 1 22.45 6m0-2a7.47 7.47 0 0 0-5.34 2.24L16 7.36l-1.11-1.12a7.49 7.49 0 0 0-10.68 0a7.72 7.72 0 0 0 0 10.82L16 29l11.79-11.94a7.72 7.72 0 0 0 0-10.82A7.49 7.49 0 0 0 22.45 4Z"/>
                           </svg>
-                        </button>
-                        <button class="tools" aria-label="tools">
+                        </a>
+                        <a href="#" class="tools" aria-label="tools">
                           <svg color="var(--txt-second)" width="32" height="32" viewBox="0 0 24 24">
                             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 1 1 0-2a1 1 0 0 1 0 2Zm0 7a1 1 0 1 1 0-2a1 1 0 0 1 0 2Zm0 7a1 1 0 1 1 0-2a1 1 0 0 1 0 2Z"/>
                           </svg>
-                        </button>
+                        </a>
                     </span>
-                </div>
+                </button>
             {/each}
         {/if}
     </div>
