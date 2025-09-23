@@ -51,7 +51,7 @@
     /* Track */
     .track {
         display: grid;
-        grid-template-columns: 40px 3.5rem 1fr 1.5fr 1fr auto;
+        grid-template-columns: 0 3.5rem 1fr 1.5fr 1fr auto;
         align-items: center;
         gap: 16px;
         width: 100%;
@@ -76,7 +76,6 @@
         min-width: 0;
     }
 
-    .number { justify-self: center; }
 
     .track__cover {
         width: 3rem;
