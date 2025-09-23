@@ -6,7 +6,7 @@
 
     async function getTracks(): Promise<Track[]> {
         let response = await fetch("http://localhost:6432/tracks");
-        return JSON.parse(await response.text());
+        return JSON.parse(await response.text())["tracks"];
     }
 
     onMount(async () => {
