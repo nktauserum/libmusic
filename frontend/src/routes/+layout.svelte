@@ -5,14 +5,13 @@
 	let { children } = $props();
 </script>
 
+<Player />
 <div class="content">
 	<div class="sources"></div>
 	<div class="playlist">
 		{@render children()}
 	</div>
 </div>
-
-<Player />
 
 <style>
 	.content {

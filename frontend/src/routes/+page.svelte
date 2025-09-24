@@ -1,6 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import type {Track} from "$lib/types/track";
+    import { playerStore } from '$lib/store';
 
     let tracks: Track[] | null = $state(null);
 
@@ -11,6 +12,9 @@
 
     async function playTrack(track: Track) {
         console.log(`http://localhost:6432/track/${track.id}`)
+        playerStore.setTrack(
+            track
+        );
     }
 
     onMount(async () => {
