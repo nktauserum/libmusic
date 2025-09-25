@@ -25,12 +25,15 @@
 <div class="player">
     <div class="track">
         <div class="track__cover"></div>
+        {#if $playerStore.track}
         <div class="track__info" >
             <div class="info__title">{$playerStore.track?.title}</div>
             <a href="/artist" class="info__artist">{$playerStore.track?.artists.join(", ")}</a>
         </div>
+        {/if}
     </div>
 
+    {#if $playerStore.track}
     <audio
             bind:this={audio}
             src={`http://localhost:6432/track/${$playerStore.track?.id}`}
@@ -86,6 +89,8 @@
         <label>Громкость:</label>
         <input type="range" bind:value={volume} min="0" max="1" step="0.01" />
     </div>
+
+    {/if}
 </div>
 
 <style>
