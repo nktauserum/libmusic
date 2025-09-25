@@ -1,9 +1,12 @@
+use std::fmt::{Debug, Display, Formatter};
 use std::sync::Arc;
 use lofty::file::TaggedFileExt;
 use lofty::read_from_path;
 use lofty::tag::ItemKey;
 use std::fs;
 use std::path::Path;
+use lofty::error::LoftyError;
+use lofty::picture::PictureType;
 use crate::repository::Repository;
 use crate::types::Track;
 
@@ -99,5 +102,19 @@ impl Library {
         let track = self.repo.get_track_by_id(id)?;
 
         Ok(track)
+    }
+
+    pub fn get_cover_by_track_id(&self, id: i64) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        let track = self.get_track_by_id(id)?;
+
+        let file = read_from_path(&track.path)?;
+
+        let tag = file.primary_tag().ok_or("Нет основного тега")?;
+
+        if let Some(cover) = tag.get_picture_type(PictureType::CoverFront) {
+            Ok(cover.data().to_vec())
+        } else {
+            Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, "Обложка не найдена")))
+        }
     }
 }

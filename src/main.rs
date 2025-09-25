@@ -7,7 +7,7 @@ mod state;
 
 use std::path::Path;
 use crate::config::Config;
-use crate::handlers::{index, track_by_id, track_list};
+use crate::handlers::{cover_by_id, index, track_by_id, track_list};
 use axum::{http, routing::get, Router};
 use tower_http::cors::{CorsLayer, Any};
 use crate::state::AppState;
@@ -34,6 +34,7 @@ async fn main() {
         .route("/", get(index))
         .route("/tracks", get(track_list))
         .route("/track/{id}", get(track_by_id))
+        .route("/cover/{id}", get(cover_by_id))
         .layer(cors)
         .with_state(state);
 

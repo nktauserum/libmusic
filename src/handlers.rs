@@ -40,3 +40,16 @@ pub async fn track_list(State(state): State<Arc<AppState>>) -> Json<Value> {
     });
     Json(json!({"tracks": tracks}))
 }
+
+pub async fn cover_by_id(State(state): State<Arc<AppState>>, Path(id): Path<i64>) -> Result<impl IntoResponse, StatusCode> {
+    let cover = state.lib.get_cover_by_track_id(id).map_err(|err| {
+        eprintln!("Error: cover_by_id(): {err}");
+        StatusCode::NOT_FOUND
+    })?;
+
+    let headers = [
+        (header::CONTENT_TYPE, "Content-Type: image/png".to_string()),
+    ];
+
+    Ok((headers, cover))
+}
