@@ -24,8 +24,8 @@
 
 <div class="player">
     <div class="track">
-        <div class="track__cover"></div>
         {#if $playerStore.track}
+        <img src="{`http://localhost:6432/cover/${$playerStore.track?.id}`}" class="track__cover" alt="cover" />
         <div class="track__info" >
             <div class="info__title">{$playerStore.track?.title}</div>
             <a href="/artist" class="info__artist">{$playerStore.track?.artists.join(", ")}</a>
