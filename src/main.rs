@@ -5,6 +5,7 @@ mod config;
 mod handlers;
 mod state;
 
+use std::path::Path;
 use crate::config::Config;
 use crate::handlers::{index, track_by_id, track_list};
 use axum::{http, routing::get, Router};
@@ -15,6 +16,15 @@ use crate::state::AppState;
 async fn main() {
     let config = Config::load("config.json").await;
     let state = AppState::new(config.db_path.as_str());
+
+    for dir in config.index_dir {
+        match state.lib.index_dir(Path::new(dir.as_str())) {
+            Ok(()) => println!("INFO: directory {dir} successfully indexed."),
+            Err(err) => {
+                eprintln!("Error: index_dir({dir}): {err}")
+            }
+        }
+    }
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
