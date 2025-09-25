@@ -3,13 +3,11 @@ import type { Track } from './types/track';
 
 interface PlayerState {
     track: Track | null;
-    audioSrc: string;
     isPlaying: boolean;
 }
 
 const initialState: PlayerState = {
     track: null,
-    audioSrc: '',
     isPlaying: false,
 };
 
@@ -21,5 +19,4 @@ export const playerStore = {
         update((state) => ({ ...state, track, isPlaying: true })),
     togglePlayback: () =>
         update((state) => ({ ...state, isPlaying: !state.isPlaying })),
-    stop: () => update((state) => ({ ...state, isPlaying: false })),
 };
