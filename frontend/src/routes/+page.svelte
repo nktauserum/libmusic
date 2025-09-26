@@ -10,11 +10,12 @@
         return JSON.parse(await response.text())["tracks"];
     }
 
-    async function playTrack(track: Track) {
-        console.log(`http://localhost:6432/track/${track.id}`)
-        playerStore.setTrack(
-            track
-        );
+    async function playTrack(track_position: number) {
+        if (tracks) {
+            playerStore.play(
+                tracks, track_position
+            );
+        }
     }
 
     onMount(async () => {
@@ -30,8 +31,8 @@
 
     <div class="tracks">
         {#if tracks !== null}
-            {#each tracks as track}
-                <button class="track" onclick={() => playTrack(track)} aria-label="track">
+            {#each tracks as track, i}
+                <button class="track" onclick={() => playTrack(i)} aria-label="track">
                     <span class="number"></span>
                     <img src="{`http://localhost:6432/cover/${track.id}`}" class="track__cover" alt="cover" />
                     <span class="title">{ track.title }</span>

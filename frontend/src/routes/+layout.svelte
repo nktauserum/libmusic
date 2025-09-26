@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import Player from '\$lib/components/Player.svelte';
+	import Queue from '\$lib/components/Queue.svelte';
 	import { playerStore } from '$lib/store';
 
 	let { children } = $props();
@@ -25,6 +26,7 @@
 		{@render children()}
 	</div>
 </div>
+<Queue />
 
 <style>
 	.content {

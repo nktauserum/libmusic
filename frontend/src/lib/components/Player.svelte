@@ -36,6 +36,7 @@
     </div>
 
     {#if $playerStore.track}
+
     <audio
             bind:this={audio}
             src={`http://localhost:6432/track/${$playerStore.track?.id}`}
@@ -122,7 +123,6 @@
             </svg>
         </button>
     </div>
-
     {/if}
 </div>
 
