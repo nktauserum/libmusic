@@ -5,6 +5,10 @@
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* Black mode */
+    color: var(--txt-first);
+    background: var(--bg-first);
 }
 
 :root {

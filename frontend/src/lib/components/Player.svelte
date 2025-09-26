@@ -4,13 +4,13 @@
     let audio: HTMLAudioElement | null = null;
     let currentTime: number = 0;
     let duration: number = 0;
-    let volume: number = 1;
+    let volume: number = 0.5;
 
     function formatTime(time: number): string {
         if (isNaN(time)) return '00:00';
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+        const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+        return `${minutes}:${seconds}`;
     }
 
     $: if (audio && $playerStore.track) {
@@ -30,6 +30,8 @@
             <div class="info__title">{$playerStore.track?.title}</div>
             <a href="/artist" class="info__artist">{$playerStore.track?.artists.join(", ")}</a>
         </div>
+        {:else}
+        <div class="track__cover"></div>
         {/if}
     </div>
 
@@ -43,13 +45,23 @@
             autoplay
     ></audio>
 
-    <div class="progress">
-        <span>{formatTime(currentTime)}</span>
-        <input type="range" bind:value={currentTime} min="0" max={duration} step="0.1" />
-        <span>{formatTime(duration)}</span>
+    <div class="audio-progress">
+        <input
+                type="range"
+                class="audio-progress__slider"
+                bind:value={currentTime}
+                min="0"
+                max={duration}
+                step="0.1"
+        />
+        <div class="audio-progress__time-display">
+            <time class="audio-progress__current-time">{formatTime(currentTime)}</time>
+            <time class="audio-progress__total-time">{formatTime(duration)}</time>
+        </div>
     </div>
 
-    <div class="controls">
+
+        <div class="controls">
         <button class="ctrl" aria-label="previous">
             <svg color="var(--txt-second)" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" d="M2 2.5a.5.5 0 0 1 1 0v11a.5.5 0 0 1-1 0v-11Zm12 .502a1 1 0 0 0-1.579-.816l-7 4.963a1 1 0 0 0-.006 1.628l7 5.037A1 1 0 0 0 14 13.003V3.002ZM6 7.965l7-4.963v10L6 7.966Z"/></svg>
         </button>
@@ -86,23 +98,90 @@
     </div>
 
     <div class="volume">
-        <label>Громкость:</label>
-        <input type="range" bind:value={volume} min="0" max="1" step="0.01" />
+        <button class="volume__btn volume__btn--min" aria-label="Mute">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5v14l-6-6H2V11h3l6-6z" fill="currentColor"/>
+            </svg>
+        </button>
+
+        <input
+                class="volume__slider"
+                type="range"
+                bind:value={volume}
+                min="0"
+                max="1"
+                step="0.01"
+                aria-label="Volume"
+        />
+
+        <button class="volume__btn volume__btn--max" aria-label="Max volume">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5v14l-6-6H2V11h3l6-6z" fill="currentColor"/>
+                <path d="M16.5 8.5a4.5 4.5 0 010 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M19 6a7 7 0 010 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+        </button>
     </div>
 
     {/if}
 </div>
 
 <style>
-    .progress {
-        display: flex;
-        align-items: center;
-        margin-top: 10px;
+    .audio-progress__slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(100% - 5rem);
+        margin: 0 2.5rem;
+        height: 5px;
+        background: var(--txt-first, #ccc);
+        opacity: 0.9;
+        outline: none;
+        transition: opacity 0.2s;
+        border-radius: 5px;
     }
 
-    input[type="range"] {
-        flex: 1;
+    .audio-progress__slider:hover {
+        opacity: 1;
+    }
+
+    .audio-progress__slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: var(--txt-first, #000);
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .audio-progress__slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: var(--txt-first, #000);
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .audio-progress__slider::-moz-range-progress {
+        background: var(--txt-first, #ccc);
+        height: 5px;
+    }
+
+    .audio-progress__time-display {
+        display: grid;
         margin: 0 2.5rem;
+        grid-template-columns: 1fr auto;
+    }
+
+    .audio-progress__current-time {
+        justify-self: start;
+    }
+
+    .audio-progress__total-time {
+        justify-self: end;
     }
 
     button {
@@ -149,7 +228,6 @@
     .info__title {
         font-size: 1.4rem;
         color: var(--txt-first);
-        margin-bottom: 5px;
     }
 
     .track__cover {
@@ -177,4 +255,86 @@
         grid-template-rows: auto auto auto 1fr;
         gap: 16px;
     }
+
+    .volume {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 2.5rem;
+    }
+
+    .volume__btn {
+        background: transparent;
+        border: none;
+        padding: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--txt-first);
+        cursor: pointer;
+    }
+    .volume__btn:focus {
+        outline: 2px solid color-mix(in srgb, var(--txt-first) 40%, transparent);
+        outline-offset: 2px;
+    }
+
+    .volume__slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(100% - 3.25rem);
+        height: 6px;
+        background: color-mix(in srgb, var(--txt-first) 30%, transparent);
+        border-radius: 6px;
+        outline: none;
+    }
+
+    .volume__slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        background: var(--txt-first);
+        border-radius: 50%;
+        box-shadow: 0 0 4px rgba(0,0,0,0.25);
+        cursor: pointer;
+        margin-top: -4px;
+    }
+
+    .volume__slider::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        background: var(--txt-first);
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 0 4px rgba(0,0,0,0.25);
+        cursor: pointer;
+    }
+
+    .volume__slider::-moz-range-progress {
+        background: var(--txt-first);
+        height: 6px;
+        border-radius: 6px;
+    }
+
+    .volume__slider::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 6px;
+        background: linear-gradient(
+                to right,
+                var(--txt-first) calc(var(--volume-percent, 50%) * 1%),
+                color-mix(in srgb, var(--txt-first) 30%, transparent) calc(var(--volume-percent, 50%) * 1%)
+        );
+    }
+
+    .volume__slider:hover,
+    .volume__btn:hover {
+        opacity: 0.95;
+    }
+
+    .volume__btn svg {
+        display: block;
+        width: 1rem;
+        height: 1rem;
+    }
+
 </style>

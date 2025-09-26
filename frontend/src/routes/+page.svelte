@@ -76,6 +76,10 @@
         outline: none;
     }
 
+    .track span, .track svg {
+        background-color: var(--bg-second);
+    }
+
     .track:hover {
         background-color: var(--bg-third);
     }
