@@ -10,7 +10,7 @@ interface PlayerState {
 
 const initialState: PlayerState = {
     track: null,
-    current_pos: 1,
+    current_pos: 0,
     queue: [],
     isPlaying: false,
 };
@@ -21,6 +21,8 @@ export const playerStore = {
     subscribe,
 
     play: (playlist: Track[], num: number) => update((state) => ({ ...state, queue: playlist, track: playlist[num], isPlaying: true, current_pos: num})),
+    next: () => update((state) => ({ ...state, track: state.queue[state.current_pos + 1], isPlaying: true, current_pos: state.current_pos+1})),
+    prev: () => update((state) => ({ ...state, track: state.queue[state.current_pos - 1], isPlaying: true, current_pos: state.current_pos-1})),
 
     setTrack: (track: Track) =>
         update((state) => ({ ...state, track, isPlaying: true })),

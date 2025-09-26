@@ -13,6 +13,14 @@
         return `${minutes}:${seconds}`;
     }
 
+    function next() {
+        playerStore.next();
+    }
+
+    function prev() {
+        playerStore.prev();
+    }
+
     $: if (audio && $playerStore.track) {
         if ($playerStore.isPlaying) {
             audio.play().catch(console.error);
@@ -63,7 +71,7 @@
 
 
         <div class="controls">
-        <button class="ctrl" aria-label="previous">
+        <button class="ctrl" aria-label="previous"  on:click="{() => prev()}">
             <svg color="var(--txt-second)" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" d="M2 2.5a.5.5 0 0 1 1 0v11a.5.5 0 0 1-1 0v-11Zm12 .502a1 1 0 0 0-1.579-.816l-7 4.963a1 1 0 0 0-.006 1.628l7 5.037A1 1 0 0 0 14 13.003V3.002ZM6 7.965l7-4.963v10L6 7.966Z"/></svg>
         </button>
 
@@ -93,7 +101,7 @@
             {/if}
         </button>
 
-        <button class="ctrl" aria-label="next">
+        <button class="ctrl" aria-label="next" on:click="{() => next()}">
             <svg color="var(--txt-second)" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" d="M14 2.5a.5.5 0 1 0-1 0v11a.5.5 0 0 0 1 0v-11ZM2 3.002a1 1 0 0 1 1.579-.816l7 4.963a1 1 0 0 1 .006 1.628l-7 5.037A1 1 0 0 1 2 13.003V3.002Zm8 4.963L3 3.002v10l7-5.037Z"/></svg>
         </button>
     </div>
