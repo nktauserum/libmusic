@@ -1,14 +1,14 @@
-use std::fmt::{Debug, Display, Formatter};
-use std::sync::Arc;
-use lofty::file::TaggedFileExt;
-use lofty::read_from_path;
-use lofty::tag::ItemKey;
-use std::fs;
-use std::path::Path;
-use lofty::error::LoftyError;
-use lofty::picture::PictureType;
 use crate::repository::Repository;
 use crate::types::Track;
+use lofty::file::TaggedFileExt;
+use lofty::picture::PictureType;
+use lofty::read_from_path;
+use lofty::tag::ItemKey;
+use rusqlite::Error;
+use std::fmt::{Debug, Display};
+use std::fs;
+use std::path::Path;
+use std::sync::Arc;
 
 pub struct Library {
     repo: Arc<Repository>,
@@ -29,7 +29,6 @@ impl Library {
                 if entry_path.is_dir() {
                     self.index_dir(&entry_path)?;
                 } else {
-                    // TODO: Option
                     self.add_track(entry_path.to_str().unwrap())?
                 }
             }
@@ -89,7 +88,22 @@ impl Library {
             }
         }
 
-        Ok(self.repo.add_track(&metadata)?)
+        match self.repo.add_track(&metadata) {
+            Ok(()) => Ok(()),
+            Err(err) => {
+                match &err {
+                    Error::SqliteFailure(err_code, _) => {
+                        // code of the UNIQUE constraint error
+                        if err_code.extended_code == 2067 {
+                            Ok(())
+                        } else {
+                            Err(err.into())
+                        }
+                    }
+                    _ => Err(err.into()),
+                }
+            }
+        }
     }
 
     pub fn get_all_tracks(&self) -> Result<Vec<Track>, Box<dyn std::error::Error>> {

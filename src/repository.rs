@@ -18,7 +18,7 @@ impl Repository {
                 artists TEXT NOT NULL,
                 album TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                path TEXT NOT NULL
+                path TEXT NOT NULL UNIQUE
             )",
             [],
         )?;
