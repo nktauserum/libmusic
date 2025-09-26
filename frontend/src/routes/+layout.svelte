@@ -1,9 +1,22 @@
 <script lang="ts">
 	import '../app.css';
 	import Player from '\$lib/components/Player.svelte';
+	import { playerStore } from '$lib/store';
 
 	let { children } = $props();
+
+	function title(): string {
+		if ($playerStore.track) {
+			return `${$playerStore.track.title} - ${$playerStore.track.artists.join(", ")} | libmusic`
+		} else {
+			return "libmusic";
+		}
+	}
 </script>
+
+<svelte:head>
+	<title>{title()}</title>
+</svelte:head>
 
 <Player />
 <div class="content">
