@@ -58,7 +58,9 @@
     .queue {
         background: var(--bg-first);
         z-index: 1000;
-        height: 100%;
+        height: 100vh;
         min-width: 20rem;
+        overflow: auto;
+
     }
 </style>

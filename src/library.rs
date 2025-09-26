@@ -5,7 +5,6 @@ use lofty::picture::PictureType;
 use lofty::read_from_path;
 use lofty::tag::ItemKey;
 use rusqlite::Error;
-use std::fmt::{Debug, Display};
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
@@ -29,7 +28,9 @@ impl Library {
                 if entry_path.is_dir() {
                     self.index_dir(&entry_path)?;
                 } else {
-                    self.add_track(entry_path.to_str().unwrap())?
+                    self.add_track(entry_path.to_str().unwrap()).unwrap_or_else(|err| {
+                        eprintln!("ERROR: add_track({path}): {err}", path = entry_path.to_str().unwrap_or_default())
+                    });
                 }
             }
         }

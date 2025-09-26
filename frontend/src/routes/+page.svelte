@@ -25,10 +25,6 @@
 </script>
 
 <div class="page">
-    <header>
-        <div class="info__title">Favorites</div>
-    </header>
-
     <div class="tracks">
         {#if tracks !== null}
             {#each tracks as track, i}
@@ -75,6 +71,11 @@
 
         cursor: pointer;
         outline: none;
+    }
+
+    .tracks {
+        overflow: auto;
+        height: 100vh;
     }
 
     .track span, .track svg {
@@ -132,21 +133,5 @@
         border: none;
         outline: none;
         cursor: pointer;
-    }
-
-    /* Header */
-
-    .info__title {
-        font-size: 1.7rem;
-        color: var(--txt-first);
-    }
-
-    header {
-        width: 100%;
-        height: 5rem;
-        padding: 1.2rem;
-        display: flex;
-        background-color: var(--bg-first);
-        gap: 3rem;
     }
 </style>
