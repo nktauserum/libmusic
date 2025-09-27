@@ -48,7 +48,8 @@ pub async fn cover_by_id(State(state): State<Arc<AppState>>, Path(id): Path<i64>
     })?;
 
     let headers = [
-        (header::CONTENT_TYPE, "Content-Type: image/png".to_string()),
+        (header::CONTENT_TYPE, "image/png".to_string()),
+        (header::CACHE_CONTROL, "public, max-age=31536000".to_string()),
     ];
 
     Ok((headers, cover))

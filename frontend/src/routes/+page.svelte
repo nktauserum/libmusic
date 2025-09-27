@@ -30,7 +30,7 @@
             {#each tracks as track, i}
                 <button class="track" onclick={() => playTrack(i)} aria-label="track">
                     <span class="number"></span>
-                    <img src="{`http://localhost:6432/cover/${track.id}`}" class="track__cover" alt="cover" />
+                    <img src="{`http://localhost:6432/cover/${track.id}`}" class="track__cover" alt="cover" loading="lazy"/>
                     <span class="title">{ track.title }</span>
                     <span class="artist">{ track.artists.join(', ') }</span>
                     <span class="album">{ track.album }</span>
