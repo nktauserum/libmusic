@@ -9,6 +9,24 @@ use std::fs;
 use std::path::Path;
 use std::sync::Arc;
 
+const ALLOWED_EXTENSIONS: [&str; 14] = [
+    "aac",
+    "aiff",
+    "ape",
+    "flac",
+    "mpeg",
+    "mp3",
+    "mp4",
+    "mpc",
+    "opus",
+    "ogg",
+    "spx",
+    "wav",
+    "wv",
+    "m4a"
+];
+
+
 pub struct Library {
     repo: Arc<Repository>,
 }
@@ -28,9 +46,12 @@ impl Library {
                 if entry_path.is_dir() {
                     self.index_dir(&entry_path)?;
                 } else {
-                    self.add_track(entry_path.to_str().unwrap()).unwrap_or_else(|err| {
-                        eprintln!("ERROR: add_track({path}): {err}", path = entry_path.to_str().unwrap_or_default())
-                    });
+                    let ext = entry_path.extension().unwrap_or_default().to_str().unwrap_or_default();
+                    if ALLOWED_EXTENSIONS.contains(&ext) {
+                        self.add_track(entry_path.to_str().unwrap()).unwrap_or_else(|err| {
+                            eprintln!("ERROR: add_track({path}): {err}", path = entry_path.to_str().unwrap_or_default())
+                        });
+                    }
                 }
             }
         }

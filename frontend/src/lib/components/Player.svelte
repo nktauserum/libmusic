@@ -241,7 +241,7 @@
     .track__cover {
         width: 20rem;
         height: 20rem;
-        margin: 2.5rem 0;
+        margin: 2.5rem 2.5rem;
         border-radius: 5%;
         background-color: var(--bg-third);
     }
