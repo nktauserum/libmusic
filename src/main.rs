@@ -17,14 +17,17 @@ async fn main() {
     let config = Config::load("config.json").await;
     let state = AppState::new(config.db_path.as_str());
 
-    for dir in config.index_dir {
-        match state.lib.index_dir(Path::new(dir.as_str())) {
-            Ok(()) => println!("INFO: directory {dir} successfully indexed."),
-            Err(err) => {
-                eprintln!("Error: index_dir({dir}): {err}")
+    let cloned_state = state.clone();
+    tokio::spawn(async move {
+        for dir in config.index_dir {
+            match cloned_state.lib.index_dir(Path::new(dir.as_str())) {
+                Ok(()) => println!("INFO: directory {dir} successfully indexed."),
+                Err(err) => {
+                    eprintln!("Error: index_dir({dir}): {err}")
+                }
             }
         }
-    }
+    });
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
