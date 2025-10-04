@@ -1,10 +1,17 @@
 <script lang="ts">
     import { playerStore } from '$lib/store';
+    import { onMount, onDestroy } from 'svelte';
+
+    const frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
     let audio: HTMLAudioElement | null = null;
     let currentTime: number = 0;
     let duration: number = 0;
     let volume: number = 0.5;
+    let audioContext: AudioContext;
+    let source: MediaElementAudioSourceNode;
+    let filters: BiquadFilterNode[] = [];
+    let gains: number[] = new Array(frequencies.length).fill(0);
 
     function formatTime(time: number): string {
         if (isNaN(time)) return '00:00';
@@ -27,6 +34,47 @@
         } else {
             audio.pause();
         }
+    }
+
+    $: if (audio && audioContext && filters.length === 0) {
+        source = audioContext.createMediaElementSource(audio);
+        let previousNode: AudioNode = source;
+        frequencies.forEach((freq, index) => {
+            const filter = audioContext.createBiquadFilter();
+            filter.frequency.value = freq;
+            filter.Q.value = 1;
+            if (index === 0) {
+                filter.type = 'lowshelf';
+            } else if (index === frequencies.length - 1) {
+                filter.type = 'highshelf';
+            } else {
+                filter.type = 'peaking';
+            }
+            filter.gain.value = gains[index];
+            previousNode.connect(filter);
+            previousNode = filter;
+            filters.push(filter);
+        });
+        previousNode.connect(audioContext.destination);
+    }
+
+    onMount(() => {
+        audioContext = new AudioContext();
+    });
+
+    onDestroy(() => {
+        if (audioContext) audioContext.close();
+    });
+
+    function updateGain(index: number, value: number) {
+        gains[index] = value;
+        if (filters[index]) {
+            filters[index].gain.value = value;
+        }
+    }
+
+    function scaleToGain(value: number): number {
+        return (value - 0.5) * 80;
     }
 </script>
 
@@ -52,6 +100,7 @@
             bind:duration
             bind:volume
             autoplay
+            crossorigin="anonymous"
     ></audio>
 
     <div class="audio-progress">
@@ -75,11 +124,15 @@
             <svg color="var(--txt-second)" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" d="M2 2.5a.5.5 0 0 1 1 0v11a.5.5 0 0 1-1 0v-11Zm12 .502a1 1 0 0 0-1.579-.816l-7 4.963a1 1 0 0 0-.006 1.628l7 5.037A1 1 0 0 0 14 13.003V3.002ZM6 7.965l7-4.963v10L6 7.966Z"/></svg>
         </button>
 
-        <button
-                class="ctrl play"
-                aria-label={$playerStore.isPlaying ? 'Pause' : 'Play' }
-                on:click={() => playerStore.togglePlayback()}
-        >
+            <button
+                    class="ctrl play"
+                    aria-label={$playerStore.isPlaying ? 'Pause' : 'Play' }
+                    on:click={async () => {
+            if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+            }
+            playerStore.togglePlayback();
+            }}>
             {#if $playerStore.isPlaying}
                 <!-- Pause icon -->
                 <svg
@@ -131,10 +184,42 @@
             </svg>
         </button>
     </div>
+
+    <div class="equalizer">
+        {#each frequencies as freq, index}
+            <div class="band">
+                <label>{freq} Hz</label>
+                <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value="0.5"
+                        on:input={(e) => {
+                          if (e.target instanceof HTMLInputElement) {
+                            updateGain(index, scaleToGain(parseFloat(e.target.value)));
+                          }
+                        }}
+                />
+                <span>{gains[index].toFixed(1)} dB</span>
+            </div>
+        {/each}
+    </div>
     {/if}
 </div>
 
 <style>
+    .equalizer {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .band {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
     .audio-progress__slider {
         -webkit-appearance: none;
         appearance: none;
