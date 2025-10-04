@@ -117,7 +117,7 @@ impl Library {
                     Error::SqliteFailure(err_code, _) => {
                         // code of the UNIQUE constraint error
                         if err_code.extended_code == 2067 {
-                            Ok(())
+                            Ok(self.repo.update_track(metadata)?)
                         } else {
                             Err(err.into())
                         }

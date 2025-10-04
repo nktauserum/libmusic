@@ -97,4 +97,23 @@ impl Repository {
 
         Ok(())
     }
+
+    pub fn update_track(&self, track: Track) -> Result<()> {
+        let conn_guard = self.connection.lock().unwrap();
+
+        conn_guard.execute(
+            "UPDATE tracks
+                SET title = ?1, artists = ?2, album = ?3
+                WHERE path = ?4
+            ",
+            params![
+                track.title,
+                track.artists.join(", "),
+                track.album,
+                track.path,
+            ],
+        )?;
+
+        Ok(())
+    }
 }
