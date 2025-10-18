@@ -29,7 +29,6 @@
     }
 
     $: if (audio && $playerStore.track) {
-        currentTime = 0;
         if ($playerStore.isPlaying) {
             audio.play().catch(console.error);
         } else {
