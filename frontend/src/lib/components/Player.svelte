@@ -29,6 +29,7 @@
     }
 
     $: if (audio && $playerStore.track) {
+        currentTime = 0;
         if ($playerStore.isPlaying) {
             audio.play().catch(console.error);
         } else {
@@ -94,13 +95,16 @@
     {#if $playerStore.track}
 
     <audio
-            bind:this={audio}
-            src={`http://localhost:6432/track/${$playerStore.track?.id}`}
-            bind:currentTime
-            bind:duration
-            bind:volume
-            autoplay
-            crossorigin="anonymous"
+        bind:this={audio}
+        src={`http://localhost:6432/track/${$playerStore.track?.id}`}
+        bind:currentTime
+        bind:duration
+        bind:volume
+        autoplay
+        crossorigin="anonymous"
+        on:ended={() => {
+            playerStore.next();
+        }}
     ></audio>
 
     <div class="audio-progress">
