@@ -8,6 +8,7 @@ use rusqlite::Error;
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
+use crate::responses::FetchPlaylistResponse;
 
 const ALLOWED_EXTENSIONS: [&str; 14] = [
     "aac",
@@ -160,5 +161,29 @@ impl Library {
 
     pub fn get_all_playlists(&self) -> Result<Vec<Playlist>, Box<dyn std::error::Error>> {
         Ok(self.repo.get_all_playlists()?)
+    }
+
+    pub fn add_track_to_playlist(&self, playlist_id: i64, track_id: i64) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(self.repo.add_track_to_playlist(playlist_id, track_id)?)
+    }
+
+    pub fn fetch_playlist(&self, playlist_id: i64) -> Result<FetchPlaylistResponse, Box<dyn std::error::Error>> {
+        let ts = self.repo.get_playlist_tracks(playlist_id)?;
+        let pl = self.repo.fetch_playlist(playlist_id)?;
+
+        Ok(FetchPlaylistResponse {
+            id: pl.id,
+            name: pl.name,
+            created_at: pl.created_at,
+            tracks: ts
+        })
+    }
+
+    pub fn remove_track_from_playlist(&self, playlist_id: i64, track_id: i64) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(self.repo.remove_track_from_playlist(playlist_id, track_id)?)
+    }
+
+    pub fn delete_playlist(&self, playlist_id: i64) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(self.repo.delete_playlist(playlist_id)?)
     }
 }

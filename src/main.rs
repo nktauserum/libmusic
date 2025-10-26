@@ -4,10 +4,11 @@ mod types;
 mod config;
 mod handlers;
 mod state;
+mod responses;
 
 use std::path::Path;
 use crate::config::Config;
-use crate::handlers::{cover_by_id, create_playlist, index, playlist_list, track_by_id, track_list};
+use crate::handlers::{cover_by_id, create_playlist, delete_playlist, fetch_playlist, index, playlist_list, remove_track_from_pl, track_by_id, track_list, update_playlist};
 use axum::{http, routing::get, routing::post, Router};
 use tower_http::cors::{CorsLayer, Any};
 use crate::state::AppState;
@@ -40,6 +41,10 @@ async fn main() {
         .route("/cover/{id}", get(cover_by_id))
         .route("/playlists", get(playlist_list))
         .route("/playlists/create", post(create_playlist))
+        .route("/playlists/{id}", get(fetch_playlist))
+        .route("/playlists/{id}/add", post(update_playlist))
+        .route("/playlists/{id}/remove_track", post(remove_track_from_pl))
+        .route("/playlists/{id}/delete", post(delete_playlist))
         .layer(cors)
         .with_state(state);
 

@@ -155,4 +155,75 @@ impl Repository {
         })?;
         rows.collect()
     }
+
+    pub fn add_track_to_playlist(&self, playlist_id: i64, track_id: i64) -> Result<()> {
+        let conn_guard = self.connection.lock().unwrap();
+        let max_pos: i32 = conn_guard.query_row(
+            "SELECT COALESCE(MAX(position), 0) FROM playlist_tracks WHERE playlist_id = ?1",
+            params![playlist_id],
+            |row| row.get(0),
+        )?;
+        conn_guard.execute(
+            "INSERT OR IGNORE INTO playlist_tracks (playlist_id, track_id, position) VALUES (?1, ?2, ?3)",
+            params![playlist_id, track_id, max_pos + 1],
+        )?;
+        Ok(())
+    }
+
+    pub fn get_playlist_tracks(&self, playlist_id: i64) -> Result<Vec<Track>> {
+        let conn_guard = self.connection.lock().unwrap();
+        let mut stmt = conn_guard.prepare(
+            "SELECT t.id, t.title, t.artists, t.album, t.created_at, t.path
+                 FROM tracks t
+                 JOIN playlist_tracks pt ON t.id = pt.track_id
+                 WHERE pt.playlist_id = ?1
+                 ORDER BY pt.position ASC"
+        )?;
+        let rows = stmt.query_map(params![playlist_id], |row| {
+            let artists_str: String = row.get(2)?;
+            Ok(Track {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                artists: artists_str.split(',').map(|p| p.trim().to_string()).filter(|p| !p.is_empty()).collect(),
+                album: row.get(3)?,
+                created_at: row.get(4)?,
+                path: row.get(5)?,
+            })
+        })?;
+        rows.collect()
+    }
+
+    pub fn fetch_playlist(&self, playlist_id:i64) -> Result<Playlist> {
+        let conn_guard = self.connection.lock().unwrap();
+        let mut stmt = conn_guard.prepare(
+            "SELECT id, name, created_at FROM playlists WHERE id = ?1",
+        )?;
+
+        Ok(stmt.query_row(params![playlist_id], |row| {
+            Ok(Playlist {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                created_at: row.get(2)?,
+            })
+        })?)
+    }
+
+    pub fn remove_track_from_playlist(&self, playlist_id: i64, track_id: i64) -> Result<()> {
+        let conn_guard = self.connection.lock().unwrap();
+        conn_guard.execute(
+            "DELETE FROM playlist_tracks WHERE playlist_id = ?1 AND track_id = ?2",
+            params![playlist_id, track_id],
+        )?;
+        conn_guard.execute(
+            "UPDATE playlist_tracks SET position = position - 1 WHERE playlist_id = ?1 AND position > (SELECT position FROM playlist_tracks WHERE playlist_id = ?1 AND track_id = ?2)",
+            params![playlist_id, track_id],
+        )?;
+        Ok(())
+    }
+
+    pub fn delete_playlist(&self, playlist_id: i64) -> Result<()> {
+        let conn_guard = self.connection.lock().unwrap();
+        conn_guard.execute("DELETE FROM playlists WHERE id = ?1", params![playlist_id])?;
+        Ok(())
+    }
 }
