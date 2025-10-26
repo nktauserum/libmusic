@@ -1,5 +1,5 @@
 use crate::repository::Repository;
-use crate::types::Track;
+use crate::types::{Playlist, Track};
 use lofty::file::TaggedFileExt;
 use lofty::picture::PictureType;
 use lofty::read_from_path;
@@ -152,5 +152,13 @@ impl Library {
         } else {
             Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, "Обложка не найдена")))
         }
+    }
+
+    pub fn create_playlist(&self, name: String) -> Result<i64, Box<dyn std::error::Error>> {
+        Ok(self.repo.create_playlist(name)?)
+    }
+
+    pub fn get_all_playlists(&self) -> Result<Vec<Playlist>, Box<dyn std::error::Error>> {
+        Ok(self.repo.get_all_playlists()?)
     }
 }

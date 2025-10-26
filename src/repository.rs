@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 use rusqlite::{params, Connection, Result};
-use crate::types::Track;
+use crate::types::{Playlist, Track};
 use rusqlite_migration::{Migrations, M};
 
 fn migrations<'a>() -> Migrations<'a> {
@@ -13,6 +13,19 @@ fn migrations<'a>() -> Migrations<'a> {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 path TEXT NOT NULL UNIQUE
             )"),
+        M::up("CREATE TABLE IF NOT EXISTS playlists (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"),
+        M::up("CREATE TABLE IF NOT EXISTS playlist_tracks (
+                playlist_id INTEGER NOT NULL,
+                track_id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                PRIMARY KEY (playlist_id, track_id),
+                FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
+                FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE
+        )")
     ])
 }
 
@@ -119,5 +132,27 @@ impl Repository {
         )?;
 
         Ok(())
+    }
+
+    pub fn create_playlist(&self, name: String) -> Result<i64> {
+        let conn_guard = self.connection.lock().unwrap();
+        conn_guard.execute(
+            "INSERT INTO playlists (name) VALUES (?1)",
+            params![name],
+        )?;
+        Ok(conn_guard.last_insert_rowid())
+    }
+
+    pub fn get_all_playlists(&self) -> Result<Vec<Playlist>> {
+        let conn_guard = self.connection.lock().unwrap();
+        let mut stmt = conn_guard.prepare("SELECT id, name, created_at FROM playlists")?;
+        let rows = stmt.query_map([], |row| {
+            Ok(Playlist {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                created_at: row.get(2)?,
+            })
+        })?;
+        rows.collect()
     }
 }
