@@ -20,25 +20,23 @@
 	<title>{title()}</title>
 </svelte:head>
 
-<Player />
-<div class="content">
-	<div class="sources">
-		<Playlists />
-	</div>
+<div class="app">
+	<Player />
+	<Playlists />
 	<div class="playlist">
 		{@render children()}
 	</div>
+	<Queue />
 </div>
-<Queue />
 
 <style>
-	.content {
+	.app {
 		width: 100%;
 		height: 100vh;
 		display: grid;
-		grid-template-columns: 20rem 1fr;
+		/* player | playlists | tracks (main) | queue */
+		grid-template-columns: 25rem 18rem 1fr 20rem;
 		gap: 1rem;
 		align-items: start;
-		padding: 1rem 0;
 	}
 </style>

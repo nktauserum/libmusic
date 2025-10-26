@@ -64,10 +64,8 @@
 
         border: none;
         font-size: 1.2rem;
-        background-color: var(--bg-second);
         color: var(--txt-first);
         border-bottom: 1px solid var(--bg-third);
-        transition: all .3s;
 
         cursor: pointer;
         outline: none;
@@ -76,20 +74,25 @@
     .tracks {
         overflow: auto;
         height: 100vh;
-    }
-
-    .track span, .track svg {
-        background-color: var(--bg-second);
+        border-right: var(--accent-color) 1px solid;
     }
 
     .track:hover {
-        background-color: var(--bg-third);
+        background-color: var(--bg-second);
+    }
+
+    .track:hover span, .track:hover .track__cover, .track:hover svg {
+        background-color: var(--bg-second);
+    }
+
+    .track:hover svg, .track:hover svg * {
+        fill: currentColor;
+        stroke: currentColor;
     }
 
     .track > * {
         min-width: 0;
     }
-
 
     .track__cover {
         width: 3rem;

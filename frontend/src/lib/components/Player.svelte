@@ -327,7 +327,7 @@
     }
 
     .track__cover {
-        width: 20rem;
+        width: calc(20rem - 1px);
         height: 20rem;
         margin: 2.5rem 2.5rem;
         border-radius: 5%;
@@ -344,12 +344,14 @@
         background: var(--bg-first);
         z-index: 1000;
 
-        height: 100%;
+        height: 100vh;
         min-width: 25rem;
 
         display: grid;
         grid-template-rows: auto auto auto 1fr;
         gap: 16px;
+
+        border-right: var(--accent-color) 1px solid;
     }
 
     .volume {
