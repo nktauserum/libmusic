@@ -1,6 +1,20 @@
 use std::sync::{Arc, Mutex};
 use rusqlite::{params, Connection, Result};
 use crate::types::Track;
+use rusqlite_migration::{Migrations, M};
+
+fn migrations<'a>() -> Migrations<'a> {
+    Migrations::new(vec![
+        M::up("CREATE TABLE IF NOT EXISTS tracks (
+                id INTEGER PRIMARY KEY,
+                title TEXT NOT NULL,
+                artists TEXT NOT NULL,
+                album TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                path TEXT NOT NULL UNIQUE
+            )"),
+    ])
+}
 
 #[derive(Clone)]
 pub struct Repository {
@@ -8,20 +22,10 @@ pub struct Repository {
 }
 
 impl Repository {
-    pub fn new(path: &str) -> Result<Self> {
-        let connection = Connection::open(path)?;
+    pub fn new(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let mut connection = Connection::open(path)?;
 
-        connection.execute(
-            "CREATE TABLE IF NOT EXISTS tracks (
-                id INTEGER PRIMARY KEY,
-                title TEXT NOT NULL,
-                artists TEXT NOT NULL,
-                album TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                path TEXT NOT NULL UNIQUE
-            )",
-            [],
-        )?;
+        migrations().to_latest(&mut connection)?;
 
         Ok(Self {
             connection: Arc::new(Mutex::new(connection)),
