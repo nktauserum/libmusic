@@ -23,7 +23,7 @@
 <div class="app">
 	<Player />
 	<Playlists />
-	<div class="playlist">
+	<div class="page">
 		{@render children()}
 	</div>
 	<Queue />
